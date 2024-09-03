@@ -10,7 +10,7 @@ from pathlib import Path
 
 # sys.path.append(f"{os.getcwd()}/api/Utils/")
 # sys.path.append(f"{os.getcwd()}/scripts/")
-from data.load_data import load_data
+from data.etl import insert_data_into_db
 from exchanges.base_api import get_api_instance
 from Utils.user_handler import *
 # from Utils.backtester import backtester
@@ -46,7 +46,7 @@ def test_handler():
     end_time='2024-08-17'
     interval = "1d"
 
-    load_data(market="binance", symbol="BTCUSDT", interval=interval, start_time=start_time, end_time=end_time)
+    insert_data_into_db(market="binance", symbol="BTCUSDT", interval=interval, start_time=start_time, end_time=end_time)
 
     # df = api.get_ohlc_data(symbol=symbol, interval=interval, start_time=start_time, end_time=end_time)
     # data = api.load_data(symbol, interval)

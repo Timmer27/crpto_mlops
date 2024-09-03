@@ -56,7 +56,7 @@ def insert_market_data(df: pd.DataFrame):
 # intervals = ["1d", "30m"]   # Example intervals
 # start_time='2023-12-01'
 # end_time='2024-08-17'
-def load_data(market: str, symbol: str, interval: str, start_time: str, end_time: str):
+def insert_data_into_db(market: str, symbol: str, interval: str, start_time: str, end_time: str):
     api = get_api_instance(market)
 
     # data = api.load_data(symbol, interval)

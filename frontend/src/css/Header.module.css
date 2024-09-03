@@ -1,0 +1,21 @@
+.logo {
+    vertical-align: middle;
+    height: 30px;
+  }
+  
+  .dropdown-toggle::after {
+    display: none;
+  }
+  
+  .navbar-brand-title {
+    padding-left: 0.5em;
+  }
+  
+  .navbar {
+    padding: 0.2rem 0rem;
+  }
+  
+  .nav-link {
+    padding: 0rem;
+  }
+  
