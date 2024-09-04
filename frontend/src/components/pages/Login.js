@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css";
-import axiosInstance from "../api";
+import axiosInstance from "../../api";
 
 let changeForm = (e) => {
   let switchCtn = document.querySelector("#switch-cnt");

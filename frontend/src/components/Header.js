@@ -80,10 +80,10 @@ function Header() {
   //     const setTitle = () => {
   //       let title = "freqUI";
   //       if (settingsStore.openTradesInTitle === OpenTradeVizOptions.asTitle) {
-  //         title = `(${botStore.activeBotorUndefined?.openTradeCount}) ${title}`;
+  //         title = `(${botStore.orUndefined?.openTradeCount}) ${title}`;
   //       }
-  //       if (botStore.activeBotorUndefined?.botName) {
-  //         title = `${title} - ${botStore.activeBotorUndefined?.botName}`;
+  //       if (botStore.orUndefined?.botName) {
+  //         title = `${title} - ${botStore.orUndefined?.botName}`;
   //       }
   //       document.title = title;
   //     };
@@ -93,7 +93,7 @@ function Header() {
   //         settingsStore.openTradesInTitle !== settingsStore.openTradesInTitle;
   //       if (needsUpdate) {
   //         setTitle();
-  //         setOpenTradesAsPill(botStore.activeBotorUndefined?.openTradeCount || 0);
+  //         setOpenTradesAsPill(botStore.orUndefined?.openTradeCount || 0);
   //       }
   //     };
 
@@ -118,17 +118,17 @@ function Header() {
 
   //   useEffect(() => {
   //     setTitle();
-  //   }, [botStore.activeBotorUndefined?.botName]);
+  //   }, [botStore.orUndefined?.botName]);
 
   //   useEffect(() => {
   //     if (settingsStore.openTradesInTitle === OpenTradeVizOptions.showPill) {
-  //       setOpenTradesAsPill(botStore.activeBotorUndefined?.openTradeCount || 0);
+  //       setOpenTradesAsPill(botStore.orUndefined?.openTradeCount || 0);
   //     } else if (
   //       settingsStore.openTradesInTitle === OpenTradeVizOptions.asTitle
   //     ) {
   //       setTitle();
   //     }
-  //   }, [botStore.activeBotorUndefined?.openTradeCount]);
+  //   }, [botStore.orUndefined?.openTradeCount]);
 
   return (
     <header>
@@ -159,8 +159,8 @@ function Header() {
             {botStore.canRunBacktest && (
               <div href="/backtest">Backtest</div>
             )}
-            {/* {botStore.activeBot?.isWebserverMode &&
-              botStore.activeBot.botApiVersion >= 2.3 && (
+            {/* {botStore.?.isWebserverMode &&
+              botStore.botApiVersion >= 2.3 && (
                 <div href="/pairlist_config">Pairlist Config</div>
               )} */}
             {/* <ThemeSelect /> */}
@@ -198,13 +198,13 @@ function Header() {
             </div>
             <li className="d-none d-sm-flex flex-sm-wrap flex-lg-nowrap align-items-center nav-item text-secondary me-2">
               <p className="verticalCenter small me-2">
-                {(botStore.activeBotorUndefined &&
-                  botStore.activeBotorUndefined.botName) ||
+                {(botStore.orUndefined &&
+                  botStore.orUndefined.botName) ||
                   "No bot selected"}
               </p>
               {botStore.botCount === 1 && (
                 <p className="verticalCenter">
-                  {botStore.activeBotorUndefined &&
+                  {botStore.orUndefined &&
                   botStore.activeBotorUndefined.isBotOnline
                     ? "Online"
                     : "Offline"}
