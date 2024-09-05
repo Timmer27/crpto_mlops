@@ -40,7 +40,7 @@ const ChartsView = () => {
   // }, [botStore]);
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-[1200px]">
       {botStore.isWebserverMode && (
         <div className="mt-2">
           <div className="flex flex-wrap mx-1 gap-5 gap-md-2">
