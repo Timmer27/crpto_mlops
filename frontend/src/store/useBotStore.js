@@ -7,12 +7,14 @@ import axios from "axios";
 
 const api = null;
 const userService = null;
+const BASE_URL = 'http://localhost:5001'
 
 export const useBotStore = create(
   persist(
     (set, get) => ({
       // api: useApi(userService, botId),
       websocketStarted: false,
+      isWebserverMode: true,
       isSelected: true,
       ping: "",
       botStatusAvailable: false,
@@ -42,19 +44,22 @@ export const useBotStore = create(
       detailTradeId: null,
       selectedPair: "",
       plotPair: "",
-      candleData: {},
+      candleData: [],
+      stake_currency: "",
+      stake_currency_decimals: "",
+      bot_name: "",
       candleDataStatus: "loading",
       history: {},
       historyStatus: "not_loaded",
       historyTakesLonger: false,
       strategyPlotConfig: undefined,
-      strategyList: [],
+      strategyList: ["test strategy1", "test strategy2", "test strategy3"],
       freqaiModelList: [],
       exchangeList: [],
       strategy: {},
       pairlist: [],
       pairlistWithTimeframe: [],
-      timeframe: "5m",
+      timeframe: "1d",
       currentLocks: undefined,
       backtestRunning: false,
       backtestProgress: 0.0,
@@ -72,44 +77,44 @@ export const useBotStore = create(
       },
 
       // Computed properties
-      get version() {
-        return get().botState.version || get().versionState;
+      get newVersion() {
+        return get().version || get().versionState;
       },
       get botApiVersion() {
-        return get().botState.api_version || 1.0;
+        return get().api_version || 1.0;
       },
       get stakeCurrency() {
-        return get().botState.stake_currency || "";
+        return get().stake_currency || "";
       },
       get stakeCurrencyDecimals() {
-        return get().botState.stake_currency_decimals || 3;
+        return get().stake_currency_decimals || 3;
       },
-      get canRunBacktest() {
-        return get().botState.runmode === "WEBSERVER";
-      },
-      get isWebserverMode() {
-        return get().botState.runmode === "WEBSERVER";
-      },
+      // get canRunBacktest() {
+      //   return get().runmode === "WEBSERVER";
+      // },
+      // get isWebserverMode() {
+      //   return get().runmode === "WEBSERVER";
+      // },
       get selectedBacktestResult() {
         return (
           get().backtestHistory[get().selectedBacktestResultKey]?.strategy || {}
         );
       },
       get shortAllowed() {
-        return get().botState.short_allowed || false;
+        return get().short_allowed || false;
       },
       get openTradeCount() {
         return get().openTrades.length;
       },
       get isTrading() {
-        return (
-          get().botState.runmode === "LIVE" ||
-          get().botState.runmode === "DRY_RUN"
-        );
+        return get().runmode === "LIVE" || get().runmode === "DRY_RUN";
       },
-      get timeframe() {
-        return get().botState.timeframe || "";
+      get getTimeframe() {
+        return get().timeframe || "";
       },
+      // get setTimeframe(timeframe) {
+      //   return set();
+      // },      
       get closedTrades() {
         return get()
           .trades.filter((item) => !item.is_open)
@@ -134,11 +139,11 @@ export const useBotStore = create(
         return (
           get().autoRefresh &&
           get().isBotOnline &&
-          get().botState.runmode !== "WEBSERVER"
+          get().runmode !== "WEBSERVER"
         );
       },
       get botName() {
-        return get().botState.bot_name || "freqtrade";
+        return get().bot_name || "freqtrade";
       },
       get allTrades() {
         return [...get().openTrades, ...get().trades];
@@ -149,6 +154,10 @@ export const useBotStore = create(
 
       // Actions
       botAdded: () => set({ autoRefresh: userService.getAutoRefresh() }),
+
+      setTimeFrame: (newTimeframe) => set({ timeframe: newTimeframe }),
+      
+      setPlotPair: (newPlotPair) => set({ plotPair: newPlotPair }),
 
       async fetchPing() {
         try {
@@ -327,20 +336,13 @@ export const useBotStore = create(
           set({ candleDataStatus: "loading" });
           try {
             let result = null;
-            const { data } = await axios.get("/pair_candles", {
+            const { data } = await axios.get(`${BASE_URL}/pair_candles`, {
               params: payload,
             });
             result = data;
             if (result) {
               set({
-                candleData: {
-                  ...get().candleData,
-                  [`${payload.pair}__${payload.timeframe}`]: {
-                    pair: payload.pair,
-                    timeframe: payload.timeframe,
-                    data: result,
-                  },
-                },
+                candleData: result,
                 candleDataStatus: "success",
               });
             }

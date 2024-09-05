@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useBotStore } from "../../store/useBotStore";
 
-const TimeframeSelect = ({ value = "", belowTimeframe = "", onInput }) => {
+const TimeframeSelect = ({ value = ""}) => {
+  const botStore = useBotStore()
   const [selectedTimeframe, setSelectedTimeframe] = useState(value);
 
   // The below list must always remain sorted correctly!
@@ -27,18 +29,14 @@ const TimeframeSelect = ({ value = "", belowTimeframe = "", onInput }) => {
 
   // Compute available timeframes based on belowTimeframe
   const availableTimeframes = useMemo(() => {
-    if (!belowTimeframe) {
-      return availableTimeframesBase;
-    }
-    const idx = availableTimeframesBase.findIndex((v) => v === belowTimeframe);
-    return availableTimeframesBase.slice(0, idx);
-  }, [belowTimeframe]);
+    return availableTimeframesBase;
+  }, []);
 
   // Handle change in the select box
   const handleTimeframeChange = (event) => {
     const newTimeframe = event.target.value;
     setSelectedTimeframe(newTimeframe);
-    onInput(newTimeframe);
+    botStore.setTimeFrame(newTimeframe);
   };
 
   return (

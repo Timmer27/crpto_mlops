@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./bootstrap.css";
 import axiosInstance from "../../api";
 import axios from "axios";
 const _ = require("lodash");

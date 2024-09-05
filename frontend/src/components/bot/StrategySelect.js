@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useBotStore } from "../../store/useBotStore";
+import { Button } from "react-bootstrap";
 
 const StrategySelect = ({ modelValue, showDetails, onUpdateModelValue }) => {
   const botStore = useBotStore((state) => state);
@@ -24,7 +25,7 @@ const StrategySelect = ({ modelValue, showDetails, onUpdateModelValue }) => {
 
   return (
     <div>
-      <div className="w-100 d-flex">
+      <div className="w-100 flex">
         <select
           id="strategy-select"
           value={localStrategy}
@@ -37,10 +38,10 @@ const StrategySelect = ({ modelValue, showDetails, onUpdateModelValue }) => {
             </option>
           ))}
         </select>
-        <div className="ms-1">
-          <button onClick={refreshStrategyList} className="btn btn-secondary">
-            <i className="mdi mdi-refresh" />
-          </button>
+        <div className="flex">
+          <Button onClick={refreshStrategyList} className="btn btn-secondary">
+            button
+          </Button>
         </div>
       </div>
 
@@ -49,7 +50,7 @@ const StrategySelect = ({ modelValue, showDetails, onUpdateModelValue }) => {
           value={botStore.strategy?.code || ""}
           readOnly
           className="w-100 h-100 form-control mt-2"
-        ></textarea>
+        />
       )}
     </div>
   );

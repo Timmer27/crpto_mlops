@@ -28,13 +28,13 @@ export default function CandleChartContainer(props) {
   const colorStore = useColorStore();
 
   function refresh() {
-    if (botStore.plotPair && props.timeframe) {
+    if (botStore.plotPair && botStore.timeframe) {
       setIsLoadingDataset(true);
       if (props.historicView) {
         botStore
           .getPairHistory({
             pair: botStore.plotPair,
-            timeframe: props.timeframe,
+            timeframe: botStore.timeframe,
             timerange: props.timerange,
             strategy: props.strategy,
             freqaimodel: props.freqaiModel,
@@ -45,7 +45,7 @@ export default function CandleChartContainer(props) {
         botStore
           .getPairCandles({
             pair: botStore.plotPair,
-            timeframe: props.timeframe,
+            timeframe: botStore.timeframe,
             columns: plotStore.usedColumns,
           })
           .then(() => setIsLoadingDataset(false));
@@ -94,27 +94,18 @@ export default function CandleChartContainer(props) {
   }, []);
 
   useEffect(() => {
-    console.log('?????', props.historicView, props.timeframe)
-    console.log('historicView', props.historicView)
-    console.log('timeframe',props.timeframe)
-    if (props.historicView) {
-      setDataset(
-        botStore.history[`${botStore.plotPair}__${props.timeframe}`]?.data
-      );
-    } else {
-      setDataset(
-        botStore.candleData[`${botStore.plotPair}__${props.timeframe}`]?.data
-      );
-    }
-  }, [props.historicView, props.timeframe]);
+    setDataset(
+      botStore.candleData[`${botStore.plotPair}__${botStore.timeframe}`]?.data
+    );
+  }, [botStore.timeframe]);
 
   useEffect(() => {
-    setStrategyName(props.strategy || dataset?.strategy || "");
-    setDatasetColumns(dataset ? dataset.all_columns ?? dataset.columns : []);
-    setDatasetLoadedColumns(
-      dataset ? dataset.columns ?? dataset.all_columns : []
-    );
-    setHasDataset(dataset && dataset.data.length > 0);
+    // setStrategyName(props.strategy || dataset?.strategy || "");
+    // setDatasetColumns(dataset ? dataset.all_columns ?? dataset.columns : []);
+    // setDatasetLoadedColumns(
+    //   dataset ? dataset.columns ?? dataset.all_columns : []
+    // );
+    // setHasDataset(dataset && dataset.data.length > 0);
   }, [dataset]);
 
   useEffect(() => {
@@ -141,70 +132,55 @@ export default function CandleChartContainer(props) {
   }, [props.historicView]);
 
   return (
-    <div className="d-flex h-100">
-      <div className="flex-fill w-100 flex-column align-items-stretch d-flex h-100">
-        <div className="d-flex me-0">
-          <div className="ms-1 ms-md-2 d-flex flex-wrap flex-md-nowrap align-items-center w-auto">
-            <span className="ms-md-2 text-nowrap">
-              {strategyName} | {props.timeframe || ""}
+    <div className="flex h-full">
+      <div className="flex-grow flex flex-col w-full h-full">
+        <div className="flex mb-0">
+          <div className="ms-1 md:ms-2 flex flex-wrap md:flex-nowrap items-center w-auto">
+            <span className="md:ms-2 whitespace-nowrap">
+              {strategyName || "no strategy"} | {botStore.timeframe || ""}
             </span>
-            {/* <FormSelect
-              // value={botStore.plotPair}
-              value={['test1', 'test2']}
-              className="ms-md-2"
-              options={props.availablePairs.map((pair) => ({
-                value: pair,
-                label: pair,
-              }))}
-              styles={{ minWidth: "7em" }}
-              isClearable={false}
-              onChange={() => refresh()}
-            /> */}
-            <Form>
-              <Form.Group controlId="formSelect">
-                <Form.Label>Select an option</Form.Label>
-                <Form.Select
-                  value={botStore.plotPair}
-                  onChange={() => refresh()}
-                  styles={{ minWidth: "7em" }}
-                  className="ms-md-2"
-                >
-                  {props.availablePairs.map((pair) => {
-                    return <option value={pair}>pair</option>;
-                  })}
-                  <option value="">Choose...</option>
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
-                </Form.Select>
-              </Form.Group>
-              <Button
+
+            <form className="md:ms-2 min-w-[7em]">
+              <select
+                value={botStore.plotPair}
+                onChange={(e) => {
+                  // console.log( 'e', e.target.value )
+                  botStore.setPlotPair(e.target.value);
+                }}
+                className="ms-2 min-w-[7em]"
+              >
+                {props.availablePairs.map((pair) => (
+                  <option key={pair} value={pair}>
+                    {pair}
+                  </option>
+                ))}
+              </select>
+              <button
                 title="Refresh chart"
-                className="ms-2"
+                className="ms-2 px-2 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
                 disabled={!botStore.plotPair || isLoadingDataset}
-                size="sm"
                 onClick={refresh}
               >
                 Refresh
-              </Button>
-            </Form>
+              </button>
+            </form>
 
             {isLoadingDataset && (
-              <Spinner animation="border" size="sm" className="ms-2" />
+              <div className="ms-2 animate-spin">Loading...</div>
             )}
-            <div className="d-flex flex-column">
-              <div className="d-flex flex-row flex-wrap">
+            <div className="flex flex-col">
+              <div className="flex flex-row flex-wrap">
                 {dataset && (
                   <>
                     <small
-                      className="ms-2 text-nowrap"
+                      className="ms-2 whitespace-nowrap"
                       title="Long entry signals"
                     >
                       Long entries:{" "}
                       {dataset.enter_long_signals || dataset.buy_signals}
                     </small>
                     <small
-                      className="ms-2 text-nowrap"
+                      className="ms-2 whitespace-nowrap"
                       title="Long exit signals"
                     >
                       Long exit:{" "}
@@ -213,48 +189,52 @@ export default function CandleChartContainer(props) {
                   </>
                 )}
               </div>
-              <div className="d-flex flex-row flex-wrap">
-                {dataset && dataset.enter_short_signals && (
-                  <small className="ms-2 text-nowrap">
+              <div className="flex flex-row flex-wrap">
+                {dataset?.enter_short_signals && (
+                  <small className="ms-2 whitespace-nowrap">
                     Short entries: {dataset.enter_short_signals}
                   </small>
                 )}
-                {dataset && dataset.exit_short_signals && (
-                  <small className="ms-2 text-nowrap">
+                {dataset?.exit_short_signals && (
+                  <small className="ms-2 whitespace-nowrap">
                     Short exits: {dataset.exit_short_signals}
                   </small>
                 )}
               </div>
             </div>
           </div>
-          <div className="ms-auto d-flex align-items-center w-auto">
-            <FormCheck
-              checked={settingsStore.useHeikinAshiCandles}
-              onChange={() =>
-                (settingsStore.useHeikinAshiCandles =
-                  !settingsStore.useHeikinAshiCandles)
-              }
-              label={<small className="text-nowrap">Heikin Ashi</small>}
-            />
+          <div className="ms-auto flex items-center w-auto">
+            <div className="ms-2">
+              <input
+                type="checkbox"
+                checked={settingsStore.useHeikinAshiCandles}
+                onChange={() =>
+                  (settingsStore.useHeikinAshiCandles =
+                    !settingsStore.useHeikinAshiCandles)
+                }
+              />
+              <small className="whitespace-nowrap">Heikin Ashi</small>
+            </div>
             <div className="ms-2">
               <PlotConfigurator
                 isVisible={showPlotConfig}
                 columns={datasetColumns}
               />
             </div>
-            <div className="ms-2 me-0 me-md-1">
-              <Button
+            <div className="ms-2 me-0 md:me-1">
+              <button
                 size="sm"
-                title="Plot configurator"
+                className="px-2 py-1 bg-blue-500 text-white rounded"
                 onClick={() => setShowPlotConfigModal(!showPlotConfigModal)}
               >
                 Configure
-              </Button>
+              </button>
             </div>
           </div>
         </div>
-        <div className="h-100 w-100 d-flex">
-          <div className="flex-grow-1">
+
+        <div className="flex-grow flex w-full">
+          <div className="flex-grow">
             {!hasDataset ? (
               <CandleChart
                 dataset={dataset}
@@ -271,9 +251,9 @@ export default function CandleChartContainer(props) {
             ) : (
               <div className="m-auto">
                 {isLoadingDataset ? (
-                    <Spinner animation="border" label="Spinning" />
+                  <div className="animate-spin">Loading...</div>
                 ) : (
-                  <div style={{ fontSize: "1.5rem" }}>{noDatasetText}</div>
+                  <div className="text-xl">{noDatasetText}</div>
                 )}
                 {botStore.historyTakesLonger && (
                   <p>This is taking longer than expected ... Hold on ...</p>
@@ -282,7 +262,7 @@ export default function CandleChartContainer(props) {
             )}
           </div>
           {!props.plotConfigModal && showPlotConfig && (
-            <div className="w-25">
+            <div className="w-1/4">
               <PlotConfigurator
                 isVisible={showPlotConfig}
                 columns={datasetColumns}
@@ -291,31 +271,38 @@ export default function CandleChartContainer(props) {
           )}
         </div>
       </div>
+
       {props.plotConfigModal && (
-        <Modal
-          show={showPlotConfigModal}
-          onHide={() => setShowPlotConfigModal(false)}
-          title="Plot Configurator"
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Plot Configurator</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <PlotConfigurator
-              isVisible={showPlotConfigModal}
-              columns={datasetColumns}
-            />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowPlotConfigModal(false)}
-            >
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
+        <div className="modal fade show block">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Plot Configurator</h5>
+                <button
+                  type="button"
+                  className="close"
+                  onClick={() => setShowPlotConfigModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="modal-body">
+                <PlotConfigurator
+                  isVisible={showPlotConfigModal}
+                  columns={datasetColumns}
+                />
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded"
+                  onClick={() => setShowPlotConfigModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

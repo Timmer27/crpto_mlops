@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // import * as echarts from "echarts";
 import ReactECharts from "echarts-for-react";
 import { useChartStore } from "../../store/useChartStore";
+import { useBotStore } from "../../store/useBotStore";
 
-const ChartComponent = () => {
+const CandleChart = () => {
   const {
     trades,
     dataset,
@@ -17,8 +18,13 @@ const ChartComponent = () => {
     labelSide,
   } = useChartStore();
 
+  const [dates, setDates] = useState()
+  const [ohlcData, setOhlcData] = useState()
+
   const candleChartRef = useRef(null);
   const chartOptionsRef = useRef({});
+
+  const botStore = useBotStore();
 
   const initializeChartOptions = () => {
     const MARGINLEFT = labelSide === "left" ? "5.5%" : "1%";
@@ -145,6 +151,11 @@ const ChartComponent = () => {
     }
   };
 
+  function formatTimestamps(timestamps) {
+    const date = new Date(timestamps);
+    return date.toISOString().split("T")[0]; // Extract the date in 'YYYY-MM-DD' format
+  }
+
   const updateSliderPosition = () => {
     if (!sliderPosition || !dataset) return;
 
@@ -186,11 +197,25 @@ const ChartComponent = () => {
   }, [sliderPosition]);
 
   //   return <div id="candle-chart" style={{ width: "100%", height: "400px" }} />;
+  useEffect(() => {
+    if (botStore.candleData.length > 0) {
+      const dates = botStore.candleData.map((val) => {
+        return formatTimestamps(val.datetime);
+      });
+
+      const ohlcData = botStore.candleData.map((val) => {
+        return [val.open, val.close, val.low, val.high];
+      });
+
+      setDates(dates)
+      setOhlcData(ohlcData)
+    }
+  }, [botStore.candleData]);
 
   const getOption = () => {
     return {
       title: {
-        text: "Candlestick Chart Example",
+        text: botStore.plotPair,
         left: "center",
       },
       tooltip: {
@@ -205,18 +230,7 @@ const ChartComponent = () => {
       },
       xAxis: {
         type: "category",
-        data: [
-          "2024-09-01",
-          "2024-09-02",
-          "2024-09-03",
-          "2024-09-04",
-          "2024-09-05",
-          "2024-09-06",
-          "2024-09-07",
-          "2024-09-08",
-          "2024-09-09",
-          "2024-09-10",
-        ],
+        data: dates,
         scale: true,
       },
       yAxis: {
@@ -226,18 +240,7 @@ const ChartComponent = () => {
         {
           name: "Candlestick",
           type: "candlestick",
-          data: [
-            [20, 30, 10, 35], // [Open, Close, Lowest, Highest]
-            [32, 45, 25, 50],
-            [43, 40, 30, 45],
-            [35, 50, 34, 55],
-            [40, 55, 38, 60],
-            [45, 60, 40, 65],
-            [50, 55, 48, 60],
-            [55, 60, 50, 65],
-            [60, 65, 55, 70],
-            [65, 70, 60, 75],
-          ],
+          data: ohlcData,
           itemStyle: {
             color: "#00ff00", // Bullish color
             color0: "#ff0000", // Bearish color
@@ -263,16 +266,16 @@ const ChartComponent = () => {
     // />
 
     <ReactECharts
-        style={{ width: '100%', height: '400px' }}
-        option={getOption()}
-        notMerge={true}
-        lazyUpdate={true}
-        theme={'theme_name'} // Replace with actual theme if you have one
-        // onChartReady={this.onChartReadyCallback}
-        //   onEvents={EventsDict} // Uncomment and define if you have events
-        //   opts={} // Add additional options if needed
-      />
+      style={{ width: "100%", height: "400px" }}
+      option={getOption()}
+      notMerge={true}
+      lazyUpdate={true}
+      theme={"theme_name"} // Replace with actual theme if you have one
+      // onChartReady={this.onChartReadyCallback}
+      //   onEvents={EventsDict} // Uncomment and define if you have events
+      //   opts={} // Add additional options if needed
+    />
   );
 };
 
-export default ChartComponent;
+export default CandleChart;

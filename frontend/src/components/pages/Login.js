@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./Login.css";
 import axiosInstance from "../../api";
 
 let changeForm = (e) => {

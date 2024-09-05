@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask import request
 from producer import produce
@@ -11,6 +11,7 @@ from pathlib import Path
 # sys.path.append(f"{os.getcwd()}/api/Utils/")
 # sys.path.append(f"{os.getcwd()}/scripts/")
 from data.etl import insert_data_into_db
+from data.candles import get_market_data
 from exchanges.base_api import get_api_instance
 from Utils.user_handler import *
 # from Utils.backtester import backtester
@@ -37,6 +38,18 @@ def user_handler():
     result = register(content)
     return {"Success":result[0], "Msg":str(result[1])}
 
+@app.route("/pair_candles", methods=['GET'])
+def pair_candles():
+    pair = request.args.get('pair')  # Retrieve 'pair' query param
+    timeframe = request.args.get('timeframe')  # Retrieve 'timeframe' query param
+    
+    print(f"Pair: {pair}, Timeframe: {timeframe}")
+
+    data = get_market_data(symbol=pair, interval=timeframe, start_date="2024-01-01", end_date="2024-09-01")
+    if not data:
+        return jsonify({'message': 'No data found'}), 404
+    return data
+
 @app.route("/test",methods=["GET"])
 def test_handler():
 
@@ -57,7 +70,6 @@ def test_handler():
     #     print(f"Data already exists for {market} - {symbol} - {interval}")
     # # load_data(market="binance", symbol="BTCUSDT", interval=interval, start_time=start_time, end_time=end_time)
     return {"Success": 'test'}
-
 
 
 @app.route("/backtest",methods=["POST"])
