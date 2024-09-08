@@ -1,5 +1,5 @@
 from exchanges.base_api import get_api_instance
-from Utils.db import get_connection, close_connection
+from utils.db import get_connection, close_connection
 import pandas as pd
 import time
 # from database import log_trade, get_stats, update_stats

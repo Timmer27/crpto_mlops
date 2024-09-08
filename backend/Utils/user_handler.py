@@ -3,7 +3,7 @@ import os
 sys.path.append(f"{os.getcwd()}/utils/")
 
 import hashlib
-from Utils.db import get_connection, close_connection
+from utils.db import get_connection, close_connection
 import pymysql
 
 def fetch_user(user_id: str):
