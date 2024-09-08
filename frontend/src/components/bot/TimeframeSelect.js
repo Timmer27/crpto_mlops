@@ -43,7 +43,7 @@ const TimeframeSelect = ({ value = ""}) => {
     <select
       value={selectedTimeframe}
       onChange={handleTimeframeChange}
-      className="form-select"
+      className="form-select border p-1 mx-2 rounded"
     >
       {availableTimeframes.map((timeframe, index) =>
         typeof timeframe === "string" ? (

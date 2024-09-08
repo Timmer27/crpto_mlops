@@ -3,6 +3,7 @@ import { useBotStore } from "../../store/useBotStore";
 import TimeframeSelect from "../bot/TimeframeSelect";
 import CandleChartContainer from "./CandleChartContainer";
 import StrategySelect from "../bot/StrategySelect";
+import IndicatorsModalContainer from "../indicator/IndicatorContainer";
 
 const ChartsView = () => {
   const botStore = useBotStore();
@@ -56,7 +57,10 @@ const ChartsView = () => {
               <span>Timeframe</span>
               <TimeframeSelect className="mt-1" />
             </div>
-            {/* <TimeRangeSelect value={timerange} onChange={setTimerange} /> */}
+            <div className="col-12 col-md-3 text-start flex">
+              <span>indicators</span>
+              <IndicatorsModalContainer/>
+            </div>
           </div>
         </div>
       )}
