@@ -336,7 +336,7 @@ export const useBotStore = create(
           set({ candleDataStatus: "loading" });
           try {
             let result = null;
-            const { data } = await axios.get(`${BASE_URL}/pair_candles`, {
+            const { data } = await axios.get(`${BASE_URL}/data/pair_candles`, {
               params: payload,
             });
             result = data;

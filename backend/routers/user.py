@@ -1,21 +1,12 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 from utils.user_handler import log_in, register
+from models.user import UserSessionRequest, RegisterRequest
 
 # Define the router for user-related endpoints
 user_router = APIRouter(
     prefix="/user",  # This will prefix all endpoints with /user
     tags=["user"]  # Optional: for grouping in API docs
 )
-
-class UserSessionRequest(BaseModel):
-    username: str
-    password: str
-
-class RegisterRequest(BaseModel):
-    username: str
-    email: str
-    password: str
 
 @user_router.get("/test")
 async def check():

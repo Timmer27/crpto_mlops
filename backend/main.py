@@ -1,11 +1,11 @@
-from fastapi import FastAPI, Request, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from producer import produce
 import json
 from pathlib import Path
 import uvicorn
 from data.etl import insert_data_into_db
+from models.user import *
 from routers.user import user_router
 from routers.data import data_router
 

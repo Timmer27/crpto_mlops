@@ -198,6 +198,7 @@ const CandleChart = () => {
 
   //   return <div id="candle-chart" style={{ width: "100%", height: "400px" }} />;
   useEffect(() => {
+    console.log('botStore.candleData0', botStore.candleData[0])
     if (botStore.candleData.length > 0) {
       const dates = botStore.candleData.map((val) => {
         return formatTimestamps(val.datetime);

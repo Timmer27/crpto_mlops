@@ -1,10 +1,10 @@
 from exchanges.base_api import get_api_instance
 from utils.db import get_connection, close_connection
 import pandas as pd
-import json
-# from database import log_trade, get_stats, update_stats
+from datetime import datetime
+from models.data import Candle
 
-def get_market_data(symbol: str, interval: str, start_date: str, end_date: str) -> json:
+def get_market_data(symbol: str, interval: str, start_date: str, end_date: str) -> list[Candle]:
     connection = get_connection()
     try:
         with connection.cursor() as cursor:
@@ -20,21 +20,34 @@ def get_market_data(symbol: str, interval: str, start_date: str, end_date: str) 
             cursor.execute(sql, (symbol, interval, start_date, end_date))
             result = cursor.fetchall()
 
-            # If no data found
             if not result:
-                return {'message': 'No data found'}
+                return []
 
-            # Convert result to DataFrame
             df = pd.DataFrame(result, columns=[
                 'symbol', 'interval', 'datetime', 'open', 'high', 'low', 'close', 
                 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades',
                 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
             ])
-            # Optionally, you can return JSON data
-            return df.to_json(orient="records")  # Return the result as JSON
+
+            candles_data = [
+                Candle(
+                    symbol=row['symbol'],
+                    interval=row['interval'],
+                    datetime=row['datetime'].isoformat() if isinstance(row['datetime'], (datetime, pd.Timestamp)) else str(row['datetime']),  # Convert to ISO format string
+                    open=row['open'],
+                    high=row['high'],
+                    low=row['low'],
+                    close=row['close'],
+                    volume=row['volume'],
+                    close_time=row['close_time'],  # Assuming it’s already a float or int
+                    quote_asset_volume=row['quote_asset_volume'],
+                    number_of_trades=row['number_of_trades'],
+                    taker_buy_base_asset_volume=row['taker_buy_base_asset_volume'],
+                    taker_buy_quote_asset_volume=row['taker_buy_quote_asset_volume'],
+                    ignore=row['ignore']
+                ) for index, row in df.iterrows()
+            ]
+
+            return candles_data
     finally:
         close_connection(connection)
-
-# data = get_market_data(symbol, interval, start_date, end_date)
-# if not data:
-#     return jsonify({'message': 'No data found'}), 404
